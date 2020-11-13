@@ -14,8 +14,11 @@ judul = containers[0].h1.text.strip()
 print(judul)
 paragraf_container = containers[0].findAll("p")
 
+f = open('../test/'+judul+'.txt',"w")
 #pake len 
 for i in range (len(containers[0].findAll("p"))):
     paragraf = paragraf_container[i].text.strip()
     print(paragraf)
+    f.write(paragraf)
+f.close()
     
