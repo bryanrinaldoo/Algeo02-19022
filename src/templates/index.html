@@ -1,35 +1,27 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>script by: jose,bryan,feral</title>
+    <title>
+        Entah Search Engine
+    </title>
 {% endblock %}
 
 {% block body %}
-<div class="content">
     <h1>Entah Search Engine</h1>
-
-    <th>Ketik Kalimat</th>
-    <form actions="/" method="POST">
-        <input type="text" name="content" id="content">
-        <input type="submit" value="Cari🔍">
-    </form>
-    <hr>
-    <th>Hasil Pencarian</th>
-    <div class="row">
-        <div class="col">
-            <h3>Upload File</h3>
-
-            <form action="/upload-txt" method="POST" enctype="multipart/form-data">
-            
-                <div class="form-group">
-                    <label>Select File</label>
-                    <div class="custom-file">
-                        <input type='file' class="custom-file-input" name="txt" id="txt">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Upload File</button>
-            </form>
-        </div>
-    </div>
-</div>
+    <h2>Add!</h2>
+        <p>Via file .txt</p>
+        <form method="POST" enctype="multipart/form-data" action="/addfile">
+            <p><input type="file" name="txtfile" accept=".txt" multiple></p>
+            <p><input type="submit" value="Upload"></p>
+        </form>
+        <p>Via URL (laman pada URL akan dikonversi ke dalam bentuk file .txt)</p>
+        <form action=>
+            <input type="text" name="q">
+            <input type="submit" value="Add">
+        </form>
+    <h2>Search!</h2>
+        <form>
+            <input type="text" name="q">
+            <input type="submit" value="Search">
+        </form>
 {% endblock %}
