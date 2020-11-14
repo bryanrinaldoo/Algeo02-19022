@@ -8,6 +8,12 @@
 
 {% block body %}
     <h1>Entah Search Engine</h1>
+    <p>
+        Ada {{ FILENAMES|length }} file pada database: 
+        <div class="index_filenames">
+            {{ ", ".join(FILENAMES) }}
+        </div>
+    </p>
     <h2>Add!</h2>
         <p>Via file .txt</p>
         <form method="POST" enctype="multipart/form-data" action="/addfile">

@@ -1,7 +1,46 @@
 {% extends 'index.html' %}
 
-    {% block body_search %}
-        <p>
-            Mencari {{ query }}
-        </p>
-    {% endblock %}
+{% block body_search %}
+    <div id="search_results">
+        Menampilkan hasil untuk <a href="/search?q={{ query }}">{{ query }}</a>
+        <div id="results">
+            {% for i in range(results|length) %}
+                <div class="result">
+                    <div class="result_link">
+                        <a href="./uploads/{{ results[i][0] }}">{{ results[i][1][0] }}</a>&nbsp;<sub>(D{{ i + 1 }})</sub>
+                    </div>
+                    <div class="result_wordcount">
+                        Jumlah kata: {{ results[i][1][2] }}
+                    </div>
+                    <div class="result_cosinesimilarity">
+                        Tingkat Kemiripan: {{ results[i][1][1] }}%
+                    </div>
+                    <div class="result_firstline">
+                        {{ results[i][1][3] }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div id="search_table">
+        <h3>Tabel kata dan kemunculan:</h3>
+        <table>
+            <tr>
+                <th>Term</th>
+                <th>Query</th>
+                {% for i in range(results|length) %}
+                    <th>D{{ i + 1 }}</th>
+                {% endfor %}
+            </tr>
+            {% for i in range(order|length) %}
+                <tr>
+                    <td>{{ order[i][0] }}</td>
+                    <td>{{ vectors["query"][order[i][0]] }}</td>
+                    {% for j in range(results|length) %}
+                        <td>{{ vectors[results[j][0]][order[i][0]] }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}
