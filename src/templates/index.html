@@ -9,23 +9,20 @@
 {% block body %}
     <h1>Entah Search Engine</h1>
     <h2>Add!</h2>
-        <div class="addfile">
-            <p>Via file .txt</p>
-            <form method="POST" enctype="multipart/form-data" action="/addfile">
-                <p><input type="file" name="txtfile" accept=".txt" multiple></p>
-                <p><input type="submit" value="Upload"></p>
-            </form>
-        </div>
-        <div class="addurl">
-            <p>Via URL (laman pada URL akan dikonversi ke dalam bentuk file .txt)</p>
-            <form method="POST" action="/addurl">
-                <input type="url" name="urlfile" placeholder="https://example.com or http://example.com" pattern="https://.*+http://.*">
-                <input type="submit" value="Add">
-            </form>
-        </div>
+        <p>Via file .txt</p>
+        <form method="POST" enctype="multipart/form-data" action="/addfile">
+            <p><input type="file" name="txtfile" accept=".txt" multiple></p>
+            <p><input type="submit" value="Upload"></p>
+        </form>
+        <p>Via URL (laman pada URL akan dikonversi ke dalam bentuk file .txt)</p>
+        <form method="POST" action="/addurl">
+            <input type="url" name="urlfile" placeholder="https://example.com or http://example.com" pattern="https://.*+http://.*">
+            <input type="submit" value="Add">
+        </form>
     <h2>Search!</h2>
-        <form>
-            <input type="text" name="q">
+        <form method="GET" action="/search">
+            <input type="text" name="q" placeholder="Query">
             <input type="submit" value="Search">
         </form>
+    {% block body_search %}{% endblock %}
 {% endblock %}
