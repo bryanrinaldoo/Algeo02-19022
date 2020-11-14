@@ -8,6 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 # String formatting
 import string
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 # Membuat hash table
 import collections
 from copy import deepcopy
@@ -63,9 +64,11 @@ def addurl():
 
 @app.route("/search")
 def search():
+    stemmer = StemmerFactory().create_stemmer()
     query_string = request.args.get("q").lower()
     for char in string.punctuation:
         query_string = query_string.replace(char, "")
+    query_string = stemmer.stem(query_string)
     query_list = query_string.split()
     query_vector = collections.Counter(query_list)
     vectors = {}
@@ -74,12 +77,13 @@ def search():
     for filename in os.listdir(os.path.join(os.getcwd(), app.config["UPLOAD_PATH"])):
         with open(os.path.join(app.config["UPLOAD_PATH"], filename), "r") as f:
             f_string = f.read().lower()
-            for char in string.punctuation:
-                f_string = f_string.replace(char, "")
-            f_list = f_string.split()
-            f_vector = collections.Counter(f_list)
-            vectors["%s" % filename] = f_vector
-            cosine_similarity["%s" % filename] = 0
+        for char in string.punctuation:
+            f_string = f_string.replace(char, "")
+        f_string = stemmer.stem(f_string)
+        f_list = f_string.split()
+        f_vector = collections.Counter(f_list)
+        vectors["%s" % filename] = f_vector
+        cosine_similarity["%s" % filename] = 0
     origin_vector = collections.Counter([])
     for vector in vectors:
         origin_vector += vectors[vector]
