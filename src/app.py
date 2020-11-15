@@ -51,7 +51,9 @@ def GetCosineSimilarity(kv):
 # Mengembalikan array yang berisi daftar filename pada direktori ../test
 def GetFilenames():
     items = os.listdir(app.config["UPLOAD_PATH"])
-    items.remove(".tmp")
+    for item in items:
+        if os.path.isdir(os.path.join(app.config["UPLOAD_PATH"], item)):
+            items.remove(item)
     return items
 
 # procedure UpdateDatabase()
@@ -369,6 +371,6 @@ def search():
 
         return render_template("search.html", FILENAMES=FILENAMES, query=query_string, results=results, VECTORS=VECTORS, order=order)
 
-@app.route("/../test/<path:filename>")
+@app.route("/uploads/<path:filename>")
 def display_result(filename):
     return send_from_directory(app.config["UPLOAD_PATH"], filename)
