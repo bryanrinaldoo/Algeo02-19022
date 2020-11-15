@@ -18,7 +18,6 @@ app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 5120 * 5120
 app.config["UPLOAD_EXTENSIONS"] = [".txt"]
 app.config["UPLOAD_PATH"] = "../test"
-app.config["CUSTOM_STATIC_PATH"] = "../test"
 
 # Fungsi-fungsi pembantu
 
@@ -129,6 +128,7 @@ SEARCH_RESULTS = {}
 UpdateDatabase()
 
 @app.route("/")
+@app.route("/index")
 def index():
     FILENAMES = GetFilenames()
     return render_template("index.html", FILENAMES=FILENAMES)
@@ -324,7 +324,8 @@ def addurl():
 def search():
 
     # Ambil query
-    query_string = FormatString(request.args.get("q"))
+    query = request.args.get("q")
+    query_string = FormatString(query)
 
     # Tangani kasus khusus (query kosong)
     if not query_string:
@@ -369,7 +370,7 @@ def search():
         # Untuk pembuatan tabel, perlu dibuat suatu urutan term
         order = VECTORS["query"].most_common()
 
-        return render_template("search.html", FILENAMES=FILENAMES, query=query_string, results=results, VECTORS=VECTORS, order=order)
+        return render_template("search.html", FILENAMES=FILENAMES, query=query, results=results, VECTORS=VECTORS, order=order)
 
 @app.route("/uploads/<path:filename>")
 def display_result(filename):
