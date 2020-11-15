@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Entah Search Engine</h1>
+    <h1 align="center">Entah Search Engine</h1>
     <p>
         Ada {{ FILENAMES|length }} file pada database: 
         <div class="index_filenames">
@@ -31,4 +31,5 @@
             <input type="submit" value="Search">
         </form>
     {% block body_search %}{% endblock %}
+    <p align="center"><a href=konsep ><button class=grey style="height:35px;width:85">Konsep</button></a>&nbsp&nbsp&nbsp<a href=howtouse ><button class=grey style="height:35px;width:85px">How to Use</button></a>&nbsp&nbsp&nbsp<a href=aboutus ><button class=grey style="height:35px;width:85px">About Us</button></a></p>
 {% endblock %}

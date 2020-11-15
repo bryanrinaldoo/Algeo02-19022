@@ -308,3 +308,15 @@ def search():
 @app.route("/../test/<path:filename>")
 def display_result(filename):
     return send_from_directory(app.config["UPLOAD_PATH"], filename)
+
+@app.route("/konsep")
+def konsep():
+    return render_template("konsep.html")
+
+@app.route("/howtouse")
+def howtouse():
+    return render_template("howtouse.html")
+
+@app.route("/aboutus")
+def aboutus():
+    return render_template("aboutus.html")
