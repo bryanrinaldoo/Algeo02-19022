@@ -1,15 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'base.html' %}
+{% block head %}
     <title>Document</title>
+{% endblock %}
+
+{% block body %}
 </head>
 <body>
     <p align="left"><a href=http://localhost:5000/ ><button class=grey style="height:35px;width:75">←</button></a></p>
     <h1>How To Use</h1>
-    <p>1. Pengguna bisa memilih untuk <i>upload</i> dokumen txt atau via url yg nanti akan dikonversikan ke dokumen txt </p>
+    <p>1. Pengguna bisa memilih untuk <i>upload</i> dokumen txt atau via url yg nanti akan dikonversikan ke dokumen txt. </p>
     <p>2. Pengguna bisa memasukkan query untuk mencari <i>term</i>-nya.</p>
-    <p>3. Setelah <i>term</i>-nya dicari, akan ditampilkan hasilnya. Hasilnya merupakan <i>link</i> yang akan men-<i>direct</i> ke dokumen-dokumen yg telah diupload. Dokumen diurutkan dari yang paling sesuai dengan term pencarian. Akan muncul juga tabel yang menunjukkan jumlah kemunculan <i>term-term</i> yang dicari pada dokumen-dokumen tsb</p>
+    <p>3. Setelah <i>term</i>-nya dicari, akan ditampilkan hasilnya. Hasilnya merupakan <i>link</i> yang akan men-<i>direct</i> ke dokumen-dokumen yg telah diupload. Dokumen diurutkan dari yang paling sesuai dengan term pencarian. Akan muncul juga tabel yang menunjukkan jumlah kemunculan <i>term-term</i> yang dicari pada dokumen-dokumen tsb.</p>
 </body>
-</html>
+{% endblock %}
