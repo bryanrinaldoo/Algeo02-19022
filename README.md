@@ -5,6 +5,7 @@
 ## Table of contents
 * [General info](#general-info)
 * [Setup](#setup)
+* [How to Run](#how-to-run)
 * [Features](#features)
 * [Status](#status)
 * [Contact](#contact)
@@ -22,14 +23,20 @@ program ini dapat dijalankan dengan beberapa syarat :
 - install requests (ketik pada Command Prompt 'pip install requests' (https://pypi.org/project/requests/))
 - install Sastrawi (ketik pada Command Prompt 'pip install Sastrawi' (https://pypi.org/project/Sastrawi/))
 
-## Code Examples
-Show examples of usage:
-`put-your-code-here`
+
+## How to Run
+cara menjalankan program : 
+1. buka Command Prompt pada komputer anda 
+2. change directory ke folder 'src' (pada command prompt ketik cd untuk change directory)
+3. setelah sudah berada di folder src ketik 'flask run' untuk menjalankan program 
+4. program akan berjalan dan mengeluarkan site (biasanya berbentuk seperti "http://127.0.0.1:5000/")
+5. copy dari command prompt dan paste pada browser anda 
+6. mesin pencarian entah siap untuk digunakan. 
 
 ## Features
 Fitur yang terdapat dalam program ini 
 * Search dengan cosine similarty
-* Memasukkan file txt
+* Memasukkan dokumen file .txt
 * Webscraping dari web https://www.cnnindonesia.com/, https://www.kompas.com/, dan https://www.medcom.id/ 
 
 
