@@ -1,0 +1,96 @@
+{% extends 'header.html' %}
+
+{% block header_head %}
+    <title>Perihal - Entah</title>
+{% endblock %}
+
+{% block header_body %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>About Us</h1>
+                <p>
+                    Kami merupakan kelompok yang beranggotakan tiga orang yaitu Jose, Feral, dan Bryan.
+                    Kelompok kami bernama kelompok Entah.
+                    Penamaan "Entah" sebagai nama dari kelompok kami tidak lain dan tidak bukan karena ketidakmampuan kami dalam menciptakan nama kelompok.
+                    Kelompok ini dibentuk untuk memenuhi tugas besar Aljabar Geometri IF 2123.
+                </p>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <h1>How To Use</h1>
+                <p>
+                    1. Pengguna bisa memilih untuk <i>upload</i> dokumen txt atau via url yg nanti akan dikonversikan ke dokumen txt.
+                </p>
+                <p>
+                    2. Pengguna bisa memasukkan query untuk mencari <i>term</i>-nya.
+                </p>
+                <p>
+                    3. Setelah <i>term</i>-nya dicari, akan ditampilkan hasilnya.
+                    Hasilnya merupakan <i>link</i> yang akan men-<i>direct</i> ke dokumen-dokumen yg telah diupload.
+                    Dokumen diurutkan dari yang paling sesuai dengan term pencarian.
+                    Akan muncul juga tabel yang menunjukkan jumlah kemunculan <i>term-term</i> yang dicari pada dokumen-dokumen tersebut.
+                </p>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <h1>Konsep Search Engine</h1>
+                <p>
+                    Information retrieval atau Sistem temu balik adalah menemukan (biasanya dokumen) dari sebuah ketidakstrukturan yang alami (biasanya teks) untuk memenuhi sebuah kebutuhan informasi dari koleksi yang berukuran besar (biasanya disimpan pada komputer).
+                    Sistem information retrieval atau sistem temu balik informasi bertujuan untuk mencukupi kebutuhan informasi pengguna dengan sumber informasi yang tersedia sesuai dengan situasi.
+                    Penulis mempresentasikan ide dan pikiran mereka ke dalam sebuah dokumen, pencari dokumen mencari sebuah dokumen di dalam sekumpulan dokumen dimana pencari tersebut tidak mengetahui dengan pasti bagaimana cara menemukan dan mengenali dokumen yang tepat sesuai dengan kebutuhannya, sistem temu balik informasi mempertemukan ide yang ditulis penulis tersebut dengan kebutuhan informasi yang dibutuhkan oleh pencari dokumen tersebut yang dinyatakan kedalam pernyataan (query).
+                </p> 
+                <p>
+                    Kemiripan kalimat memainkan peran penting pada berbagai penelitian yang berhubungan dengan teks dan aplikasi.
+                    Vector Space Model (VSM) digunakan sebagai representasi dari kumpulan dataset dokumen teks.
+                    Dokumen dalam Vector Space Model (VSM) berupa matriks yang berisi bobot seluruh kata pada tiap dokumen.
+                    Bobot tersebut menyatakan kepentingan atau kontribusi kata terhadap suatu dokumen dan kumpulan dokumen.
+                    Kepentingan suatu kata dalam dokumen dapat dilihat dari frekuensi kemunculannya terhadap dokumen.
+                </p>
+                <img src="{{ url_for('static', filename='sim.jpg') }}" class="img-fluid" alt="sim">
+                <p>
+                    Gambar diatas menunjukkan pemodelan dokumen teks di ruang dimensi dimana (D) adalah kalimat dokumen sedangkan (T) adalah term atau kata.Untuk mendapatkan nilai jarak atau kemiripan dokumen, dapat menggunakan berbagai macam varian rumus perhitungan jarak diantaranya adalah (1) Cosine, (2) Jaccard, (3) Dice, (3) Euclidean, (4) Manhattan, (5) Minkowski, (6) Mahalanobis, (8) Weighted.
+                    Dalam tugas ini kami akan mengunakan metode Cosine.
+                </p>
+                <p>
+                    Cosine Similarity dapat diimplementasikan untuk menghitung nilai kemiripan antar kalimat dan menjadi salah satu teknik untuk mengukur kemiripan teks yang populer.
+                    Contoh penggunaan Cosine Similarity dalam menguji kemiripan dua buah kalimat adalah sebagai berikut:
+                </p>
+                <p>
+                    Misalkan diberikan dua buah kalimat yaitu kalimat A dan B, yaitu:
+                </p>
+                <p>
+                    A : Julie loves me more than Linda loves me
+                </p>
+                <p>
+                    B : Jane likes me more than Julie loves me
+                </p>
+                <p>
+                    Uji kemiripan teks dapat dilakukan dengan rumus:
+                </p>
+                <img src="{{ url_for('static', filename='rumus.jpg') }}" class="img-fluid" alt="rumus">
+                <p>
+                    Dengan: j = |A ∩ B|   Kemiripan  =
+                </p>
+                <p>
+                    nB = jumlah kemunculan kata indeks ke-n dari daftar kata pada kalimat B.
+                </p>
+                <p>
+                    nB = jumlah kemunculan kata indeks ke-n dari daftar kata pada kalimat B.
+                </p>
+                <img src="{{ url_for('static', filename='tabel.jpg') }}" class="img-fluid" alt="tabel">
+                <p>
+                    Berdasarkan rumus tersebut di atas dilakukan penghitungan seperti di bawah ini. Dengan tingkat kemiripan teks =
+                </p>
+                <img src="{{ url_for('static', filename='hasil.jpg') }}" class="img-fluid" alt="hasil">
+                <p>
+                    = 0.821584
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

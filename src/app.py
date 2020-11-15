@@ -370,7 +370,11 @@ def search():
         # Untuk pembuatan tabel, perlu dibuat suatu urutan term
         order = VECTORS["query"].most_common()
 
-        return render_template("search.html", FILENAMES=FILENAMES, query=query, results=results, VECTORS=VECTORS, order=order)
+        return render_template("search.html", query=query, results=results, VECTORS=VECTORS, order=order)
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
 
 @app.route("/uploads/<path:filename>")
 def display_result(filename):
