@@ -35,9 +35,9 @@
             {% for i in range(order|length) %}
                 <tr>
                     <td>{{ order[i][0] }}</td>
-                    <td>{{ vectors["query"][order[i][0]] }}</td>
+                    <td>{{ VECTORS["query"][order[i][0]] }}</td>
                     {% for j in range(results|length) %}
-                        <td>{{ vectors[results[j][0]][order[i][0]] }}</td>
+                        <td>{{ VECTORS[results[j][0]][order[i][0]] }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
