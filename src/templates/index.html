@@ -1,34 +1,67 @@
 {% extends 'base.html' %}
 
 {% block head %}
-    <title>
-        Entah Search Engine
-    </title>
+    <title>Entah Search Engine</title>
 {% endblock %}
 
 {% block body %}
-    <h1>Entah Search Engine</h1>
-    <p>
-        Ada {{ FILENAMES|length }} file pada database: 
-        <div class="index_filenames">
-            {{ ", ".join(FILENAMES) }}
+    <div class="container pt-5">
+        <div class="row text-center">
+            <div class="col">
+                <a href=""><img src="{{ url_for('static', filename='logo.png') }}" class="img-fluid" alt="Entah Search Engine"></a>
+            </div>
         </div>
-    </p>
-    <h2>Add!</h2>
-        <p>Via file .txt</p>
-        <form method="POST" enctype="multipart/form-data" action="/addfile">
-            <p><input type="file" name="txtfile" accept=".txt" multiple></p>
-            <p><input type="submit" value="Upload"></p>
-        </form>
-        <p>Via URL (laman pada URL akan dikonversi ke dalam bentuk file .txt)</p>
-        <form method="POST" action="/addurl">
-            <input type="url" name="urlfile" placeholder="https://example.com or http://example.com" pattern="https://.*+http://.*">
-            <input type="submit" value="Add">
-        </form>
-    <h2>Search!</h2>
-        <form method="GET" action="/search">
-            <input type="text" name="q" placeholder="Query">
-            <input type="submit" value="Search">
-        </form>
+        <div class="row">
+            <div class="col">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                      <a href="#search_tab" class="nav-link active" data-toggle="tab">Search</a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="#add_tab" class="nav-link" data-toggle="tab">Upload</a>
+                    </li>
+                </ul>
+                <br>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="search_tab">
+                        <form method="GET" action="/search">
+                            <div class="form-group">
+                                <input class="form-control form-control-lg" type="text" name="q" autofocus>
+                            </div>
+                            <button class="btn btn-primary btn-lg btn-block btn-success" type="submit">Search</button>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="add_tab">
+                        <p>
+                            Ada {{ FILENAMES|length }} file pada database:<br>
+                            <small>{{ ", ".join(FILENAMES) }}</small>
+                        </p>
+                        <hr>
+                        <form method="POST" enctype="multipart/form-data" action="/addfile">
+                            <div class="form-group">
+                                <label for="addByFile">Upload file .txt</label>
+                                <input type="file" class="form-control-file" id="addByFile" name="txtfile" accept=".txt" multiple>
+                            </div>
+                            <button class="btn btn-primary" type="submit">Upload</button>
+                        </form>
+                        <hr>
+                        <form method="POST" action="/addurl">
+                            <div class="form-group">
+                                <label for="addByURL">
+                                    <small class="text-danger">BETA!</small>&nbsp;Web Scraping&nbsp;<small>(saat ini hanya bisa untuk kompas.com, medcom.id, dan cnnindonesia.com)</small>
+                                </label>
+                                <input class="form-control" id="addByURL" type="url" name="urlfile" placeholder="https://example.com atau http://example.com" pattern="https://.*+http://.*">
+                            </div>
+                            <button class="btn btn-primary" type="submit">Kirim</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     {% block body_search %}{% endblock %}
 {% endblock %}

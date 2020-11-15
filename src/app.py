@@ -1,8 +1,9 @@
 # Backend Website
 from flask import Flask, render_template, request, redirect, url_for, abort, send_from_directory
 from werkzeug.utils import secure_filename
-# Append nama file
+# File handling
 import os
+import shutil
 # Web Scraping
 import requests
 from bs4 import BeautifulSoup
@@ -12,6 +13,11 @@ from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 # Membuat hash table
 import collections
 from copy import deepcopy
+
+app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 5120 * 5120
+app.config["UPLOAD_EXTENSIONS"] = [".txt"]
+app.config["UPLOAD_PATH"] = "../test"
 
 # Fungsi-fungsi pembantu
 
@@ -40,21 +46,98 @@ def FrequencyCounter(s):
 def GetCosineSimilarity(kv):
     return kv[1][1]
 
-app = Flask(__name__)
-app.config["MAX_CONTENT_LENGTH"] = 5120 * 5120
-app.config["UPLOAD_EXTENSIONS"] = [".txt"]
-app.config["UPLOAD_PATH"] = "../test"
-app.config["CUSTOM_STATIC_PATH"] = "../test"
+# function GetFilenames() → array of string
+# Mengembalikan array yang berisi daftar filename pada direktori ../test
+def GetFilenames():
+    items = os.listdir(app.config["UPLOAD_PATH"])
+    for item in items:
+        if os.path.isdir(os.path.join(app.config["UPLOAD_PATH"], item)):
+            items.remove(item)
+    return items
 
+# procedure UpdateDatabase()
+# Meng-update variabel-variabel global
+def UpdateDatabase():
+
+    # Ambil daftar dokumen/berita
+    FILENAMES = GetFilenames()
+
+    # Iterasi berita satu demi satu
+    for filename in FILENAMES:
+
+        # Cek apakah file sudah pernah dimasukkan ke database
+        if filename not in SEARCH_RESULTS:
+
+            # Tambahkan berita ke dalam daftar hasil pencarian
+            SEARCH_RESULTS["%s" % filename] = ["*", 0.0, 0, "*"]
+                
+            # Ubah berita ke dalam bentuk string
+            with open(os.path.join(app.config["UPLOAD_PATH"], filename), "r", encoding="utf-8") as f:
+                f_string = f.read()
+
+                # Tambahkan judul berita ke dalam hasil pencarian
+                f.seek(0)
+                SEARCH_RESULTS["%s" % filename][0] = f.readline()
+
+            # Tambahkan kalimat pertama berita ke dalam hasil pencarian
+            # Ada 6 kemungkinan separator kalimat pertama: ". ", ".\n", "? ", "?\n", "! ", dan "!\n"
+            # Pilih yang paling pendek sebagai kalimat utama
+            s2 = []
+            s2.append(f_string.split(". ", 1)[0] + ".")
+            s2.append(f_string.split(".\n", 1)[0] + ".")
+            s2.append(f_string.split("? ", 1)[0] + "?")
+            s2.append(f_string.split("?\n", 1)[0] + "?")
+            s2.append(f_string.split("! ", 1)[0] + "!")
+            s2.append(f_string.split("!\n", 1)[0] + "!")
+            if len(s2[0]) == len(s2[1]) == len(s2[2]) == len(s2[3]) == len(s2[4]) == len(s2[5]):
+                SEARCH_RESULTS["%s" % filename][3] = s2[0][:-1]
+            else:
+                SEARCH_RESULTS["%s" % filename][3] = min(s2, key=len)
+
+            # Format isi berita agar bisa dibuat vektornya
+            f_formattedstring = FormatString(f_string)
+
+            # Tambahkan berita ke dalam daftar vektor
+            VECTORS["%s" % filename] = FrequencyCounter(f_formattedstring)
+
+            # Tambahkan jumlah kata pada berita ke dalam hasil pencarian
+            SEARCH_RESULTS["%s" % filename][2] = sum(VECTORS["%s" % filename].values())
+
+# Variabel-variabel global / database
+
+# FILENAMES : array of string
 # Daftar file yang ada pada database
-FILENAMES = os.listdir(os.path.join(os.getcwd(), app.config["UPLOAD_PATH"]))
+FILENAMES = GetFilenames()
+
+# VECTORS : {key: string, value: Counter()}
+# Daftar vektor yang akan dipakai ketika perhitungan (akan dikirim ke frontend untuk membuat tabel)
+VECTORS = {}
+# Cara penambahan elemen: VECTORS["key"] = FrequencyCounter(s : string) di mana s adalah string yang ingin diubah ke dalam vektor frekuensi kata
+
+# SEARCH_RESULTS : {key: string, value: [s1 : string, f : float, i : integer, s2 : string]}
+# Data yang akan dikirim kembali ke frontend, berisi informasi mengenai hasil pencarian
+SEARCH_RESULTS = {}
+# key = nama file berita
+# s1 = judul berita
+# f = hasil cosine similarity berita
+# i = jumlah kata pada berita
+# s2 = kalimat pertama pada berita
+# Cara penambahan elemen: search_results["key"] = [s1 : string, f : float, i : integer, s2 : string]
+
+# Inisialisasi database
+UpdateDatabase()
 
 @app.route("/")
+@app.route("/index")
 def index():
+    FILENAMES = GetFilenames()
     return render_template("index.html", FILENAMES=FILENAMES)
 
 @app.route("/addfile", methods=["POST"])
 def addfile():
+    
+    # Update daftar file
+    FILENAMES = GetFilenames()
 
     # File yang dikirim mungkin lebih dari satu, loop berikut akan meng-iterasi file-file tersebut satu demi satu
     for txtfile in request.files.getlist("txtfile"):
@@ -65,13 +148,51 @@ def addfile():
         # Tidak akan terjadi apa-apa jika nama file tidak valid
         if filename != "":
 
-            # Ambil extension file (.txt), dan kirimkan pesan error 400 ke pengguna jika extension file bukan .txt
-            ext = os.path.splitext(filename)[1]
-            if ext not in app.config["UPLOAD_EXTENSIONS"]:
-                abort(400)
+            # Save file yang diupload dengan nama sementara
+            txtfile.save(os.path.join(app.config["UPLOAD_PATH"], ".tmp/temp.txt"))
+            
+            # File akan disave
+            # Mungkin file tersebut merupakan duplikat, mungkin file tersebut unik tapi namanya sudah dipakai oleh file lain pada database
+            # Perlu dilakukan penanganan khusus untuk kasus-kasus ini
+            i = 1
+            isSaved = False
+            while not isSaved:
+            
+                # Cek apakah file sudah ada di database
+                if filename not in FILENAMES:
 
-            # Save file ke ../test/
-            txtfile.save(os.path.join(app.config["UPLOAD_PATH"], filename))
+                    # Pastikan loop tidak akan diulang
+                    isSaved = True
+                    
+                    # Ambil extension file (.txt), dan kirimkan pesan error 400 ke pengguna jika extension file bukan .txt
+                    ext = os.path.splitext(filename)[1]
+                    if ext not in app.config["UPLOAD_EXTENSIONS"]:
+                        abort(400)
+
+                    # Move file ke ../test/
+                    shutil.move((os.path.join(app.config["UPLOAD_PATH"], ".tmp/temp.txt")), (os.path.join(app.config["UPLOAD_PATH"], filename)))
+
+                    # Update database
+                    UpdateDatabase()
+
+                # Jika file bernama sama sudah ada,
+                else:
+
+                    # Buka kedua file
+                    with open(os.path.join(app.config["UPLOAD_PATH"], ".tmp/temp.txt")) as newfile:
+                        newtxt = newfile.read()
+                    with open(os.path.join(app.config["UPLOAD_PATH"], filename)) as existingfile:
+                        existingtxt = existingfile.read()
+
+                    # Cek apakah file yang sudah diupload merupakan file duplikat. Jika ya, file tidak akan disave
+                    if newtxt == existingtxt:
+                        isSaved = True
+                        os.remove(os.path.join(app.config["UPLOAD_PATH"], ".tmp/temp.txt"))
+
+                    # Jika tidak, rename file yang diupload, cek lagi apakah file yang sudah direname ini juga memiliki duplikat
+                    else:
+                        filename = secure_filename(os.path.splitext(txtfile.filename)[0] + "_" + str(i) + os.path.splitext(txtfile.filename)[1])
+                        i += 1
     
     # Refresh web page
     return redirect(url_for("index"))
@@ -79,6 +200,9 @@ def addfile():
 @app.route("/addurl", methods=["POST"])
 def addurl():
 
+    # Update daftar file
+    FILENAMES = GetFilenames()
+    
     # Ambil link yang dikirim
     link = request.form.get("urlfile")
 
@@ -190,6 +314,9 @@ def addurl():
     else:
         abort(400)
 
+    # Update database
+    UpdateDatabase()
+    
     # Refresh web page
     return redirect(url_for("index"))
 
@@ -197,77 +324,16 @@ def addurl():
 def search():
 
     # Ambil query
-    query_string = FormatString(request.args.get("q"))
+    query = request.args.get("q")
+    query_string = FormatString(query)
 
     # Tangani kasus khusus (query kosong)
     if not query_string:
         return render_template("index.html", FILENAMES=FILENAMES)
     else:
 
-        # Inisialisasi hash table untuk daftar vektor dan result yang akan dikirim
-
-        # vectors {key: string, value: Counter()}
-        vectors = {}
-        # Cara penambahan elemen: vectors["key"] = FrequencyCounter(s) di mana s adalah string yang ingin diubah ke dalam vektor frekuensi kata
-
-        # search_results = {key: string, value: [s1 : string, f : float, i : integer, s2 : string]}
-        search_results = {}
-        # key = nama file berita
-        # s1 = judul berita
-        # f = hasil cosine similarity berita
-        # i = jumlah kata pada berita
-        # s2 = kalimat pertama pada berita
-        # Cara penambahan elemen: search_results["key"] = [s1 : string, f : float, i : integer, s2 : string]
-
         # Tambahkan query ke dalam daftar vektor
-        vectors["query"] = FrequencyCounter(query_string)
-
-        # Tidak ada lagi yang bisa kita lakukan dengan query. Sekarang kita buat dulu vektor frekuensi kata dari tiap-tiap berita
-        # Iterasi berita satu demi satu
-        for filename in os.listdir(os.path.join(os.getcwd(), app.config["UPLOAD_PATH"])):
-
-            # Tambahkan berita ke dalam daftar hasil pencarian
-            search_results["%s" % filename] = ["*", 0.0, 0, "*"]
-            
-            # Ubah berita ke dalam bentuk string
-            with open(os.path.join(app.config["UPLOAD_PATH"], filename), "r", encoding="utf-8") as f:
-                f_string = f.read()
-
-                # Tambahkan judul berita ke dalam hasil pencarian
-                f.seek(0)
-                search_results["%s" % filename][0] = f.readline()
-
-            # Tambahkan kalimat pertama berita ke dalam hasil pencarian
-            # Ada 2 kemungkinan separator kalimat pertama: ". " dan ".\n"
-            # Pilih yang lebih pendek sebagai kalimat utama
-            s2a = f_string.split(". ", 1)[0]
-            s2b = f_string.split(".\n", 1)[0]
-            if len(s2a) <= len(s2b):
-                search_results["%s" % filename][3] = s2a + "."
-            else:
-                search_results["%s" % filename][3] = s2b + "."
-
-            # Format isi berita agar bisa dibuat vektornya
-            f_formattedstring = FormatString(f_string)
-
-            # Tambahkan berita ke dalam daftar vektor
-            vectors["%s" % filename] = FrequencyCounter(f_formattedstring)
-
-            # Tambahkan jumlah kata pada berita ke dalam hasil pencarian
-            search_results["%s" % filename][2] = sum(vectors["%s" % filename].values())
-
-        # Samakan dimensi semua vektor
-
-        # Buat vektor nol berdimensi n, n = jumlah kata unik pada query maupun berita-berita
-        origin_vector = collections.Counter([])
-        for vector in vectors:
-            origin_vector += vectors[vector]
-        origin_vector.subtract(origin_vector)
-
-        # Translasi semua vektor ke dalam dimensi n
-        for vector in vectors:
-            vectors[vector].update(origin_vector)
-
+        VECTORS["query"] = FrequencyCounter(query_string)
         
         # Cosine similarity
         # Jika q = vektor query dan d = vektor dokumen, maka
@@ -275,36 +341,37 @@ def search():
 
         # Hitung ||q||
         query_mag = 0
-        for term in vectors["query"]:
-            query_mag += (vectors["query"][term] ** 2)
+        for term in VECTORS["query"]:
+            query_mag += (VECTORS["query"][term] ** 2)
         query_mag **= 0.5
 
         # Hitung ||d|| dan q • d
-        for filename in search_results:
+        for filename in SEARCH_RESULTS:
             
             # ||d||
             file_mag = 0
-            for term in vectors[filename]:
-                file_mag += (vectors[filename][term] ** 2)
+            for term in VECTORS[filename]:
+                file_mag += (VECTORS[filename][term] ** 2)
             file_mag **= 0.5
 
             # q • d
             cross = 0
-            for term in vectors[filename]:
-                cross += (vectors["query"][term] * vectors[filename][term])
+            for term in VECTORS["query"]:
+                if term in VECTORS[filename]:
+                    cross += (VECTORS["query"][term] * VECTORS[filename][term])
             
             # Hitung cosine similarity (dalam %), tambahkan ke dalam hasil pencarian
-            search_results[filename][1] = (cross / (query_mag * file_mag)) * 100
+            SEARCH_RESULTS[filename][1] = (cross / (query_mag * file_mag)) * 100
         
         # Ubah cosine similarity ke dalam bentuk list dengan [(k1, [s11, f1, i1, s21]), (k2, [s12, f2, i2, s22]), dst.], f1 ≥ f2 ≥ f3 dst.
-        results = list(search_results.items())
+        results = list(SEARCH_RESULTS.items())
         results.sort(reverse=True, key=GetCosineSimilarity)
 
         # Untuk pembuatan tabel, perlu dibuat suatu urutan term
-        order = vectors["query"].most_common()
+        order = VECTORS["query"].most_common()
 
-        return render_template("search.html", FILENAMES=FILENAMES, query=query_string, results=results, vectors=vectors, order=order)
+        return render_template("search.html", FILENAMES=FILENAMES, query=query, results=results, VECTORS=VECTORS, order=order)
 
-@app.route("/../test/<path:filename>")
+@app.route("/uploads/<path:filename>")
 def display_result(filename):
     return send_from_directory(app.config["UPLOAD_PATH"], filename)
