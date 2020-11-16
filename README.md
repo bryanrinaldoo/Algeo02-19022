@@ -36,7 +36,7 @@ cara menjalankan program :
 ## Features
 Fitur yang terdapat dalam program ini 
 * Search dengan cosine similarty
-* Memasukkan dokumen file .txt
+* Memasukkan dokumen file .txt (untuk menjalankan upload file Bikin folder .tmp di dalam folder test)
 * Webscraping dari web https://www.cnnindonesia.com/, https://www.kompas.com/, dan https://www.medcom.id/ 
 
 
