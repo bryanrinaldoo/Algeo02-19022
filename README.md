@@ -29,7 +29,7 @@ cara menjalankan program :
 1. buka Command Prompt pada komputer anda 
 2. change directory ke folder 'src' (pada command prompt ketik cd untuk change directory)
 3. setelah sudah berada di folder src ketik 'flask run' untuk menjalankan program 
-4. program akan berjalan dan mengeluarkan site (biasanya berbentuk seperti "http://127.0.0.1:5000/")
+4. program akan berjalan tunggu hingga mengeluarkan site (biasanya berbentuk seperti "http://127.0.0.1:5000/") (kecepatan mengeluarkan site tergantung komputer dan banyak file yang ada)
 5. copy dari command prompt dan paste pada browser anda 
 6. mesin pencarian entah siap untuk digunakan. 
 
